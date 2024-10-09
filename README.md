@@ -36,7 +36,7 @@ cargo fmt
 
 ## TODO
 - v1.0
-    - encrypt / decrypt
+    -[x] encrypt / decrypt
     - store / read from disk
     - generate passwords
 - v2.0
