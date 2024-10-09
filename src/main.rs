@@ -1,6 +1,12 @@
 use openssl::aes::{aes_ige, AesKey, KeyError};
 use openssl::symm::Mode;
 
+#[derive(Debug)]
+enum SsapError {
+    InvalidKey,
+    InvalidCiphertext,
+}
+
 struct Ssap {
     // TODO: Add fields here
 }
@@ -24,7 +30,7 @@ fn encrypt_aes128(
     mut plaintext: Vec<u8>,
     mut key: Vec<u8>,
     iv: &mut [u8],
-) -> Result<Vec<u8>, KeyError> {
+) -> Result<Vec<u8>, SsapError> {
     if plaintext.len() % 16 != 0 {
         plaintext.resize(plaintext.len() / 16 * 16 + 16, 0 as u8);
     }
@@ -35,9 +41,12 @@ fn encrypt_aes128(
     let mut ciphertext: Vec<u8> = Vec::new();
     for i in (0..plaintext.len()).step_by(16) {
         let block = &plaintext[i..i + 16];
-        let aes_key_r = AesKey::new_encrypt(key.as_ref())?;
+        let aes_key_r = AesKey::new_encrypt(key.as_ref());
+        if aes_key_r.is_err() {
+            return Err(SsapError::InvalidKey);
+        }
         let mut out: &mut [u8] = &mut [0; 16];
-        aes_ige(block, &mut out, &aes_key_r, iv, Mode::Encrypt);
+        aes_ige(block, &mut out, &aes_key_r.unwrap(), iv, Mode::Encrypt);
         ciphertext.append(&mut Vec::from(out));
     }
 
@@ -67,10 +76,10 @@ fn decrypt_aes128(
     mut ciphertext: Vec<u8>,
     mut key: Vec<u8>,
     start_iv: &mut [u8],
-) -> Result<Vec<u8>, KeyError> {
+) -> Result<Vec<u8>, SsapError> {
     let mut plaintext: Vec<u8> = Vec::new();
     if ciphertext.len() % 16 != 0 {
-        // TODO Custom error
+        return Err(SsapError::InvalidCiphertext);
     }
     if key.len() % 16 != 0 {
         key.resize(16, 0 as u8);
@@ -79,9 +88,12 @@ fn decrypt_aes128(
     let mut ciphertext: Vec<u8> = Vec::new();
     for i in (0..ciphertext.len()).step_by(16) {
         let block = &ciphertext[i..i + 16];
-        let aes_key_r = AesKey::new_decrypt(key.as_ref())?;
+        let aes_key_r = AesKey::new_decrypt(key.as_ref());
+        if aes_key_r.is_err() {
+            return Err(SsapError::InvalidKey);
+        }
         let mut out: &mut [u8] = &mut [0; 16];
-        aes_ige(block, &mut out, &aes_key_r, start_iv, Mode::Decrypt);
+        aes_ige(block, &mut out, &aes_key_r.unwrap(), start_iv, Mode::Decrypt);
         plaintext.append(&mut Vec::from(out));
     }
 
@@ -97,5 +109,9 @@ fn store() {
 }
 
 fn read_disk() {
+    // TODO
+}
+
+fn new_iv() {
     // TODO
 }
