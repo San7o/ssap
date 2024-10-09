@@ -37,7 +37,7 @@ cargo fmt
 ## TODO
 - v1.0
     - [x] symmetric encrypt / decrypt
-    - [ ]store / read from disk
+    - [ ] store / read from disk
     - [ ] generate passwords
 - v2.0
     - [ ] asymmetric cryptography
