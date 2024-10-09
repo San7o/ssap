@@ -15,21 +15,27 @@ fn main() {
     let key = b"secret".to_vec();
     let plaintext = b"Ciaone".to_vec();
     // TODO: generate random first iv
-    let mut iv = b"\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F".to_vec();
+    let iv = b"\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F".to_vec();
     println!("starting iv: {:?}", iv);
     println!(
         "Ciphertext: {:?}",
-        encrypt_aes128(plaintext, key, &mut iv).unwrap()
+        encrypt_aes128(plaintext, key, iv).unwrap()
     );
-    println!("iv: {:?}", iv);
 }
 
 /// Encrypt an arbitrary number of bytes into a cypher text with the same
 /// length using the provided key for encryption.
+///
+/// # Arguments
+/// * `plaintext` - The plaintext to encrypt
+/// * `key` - The key to use for encryption
+/// * `iv` - The initial vector to use for encryption
+/// # Returns
+/// * The ciphertext
 fn encrypt_aes128(
     mut plaintext: Vec<u8>,
     mut key: Vec<u8>,
-    iv: &mut [u8],
+    mut iv: Vec<u8>,
 ) -> Result<Vec<u8>, SsapError> {
     if plaintext.len() % 16 != 0 {
         plaintext.resize(plaintext.len() / 16 * 16 + 16, 0 as u8);
@@ -46,7 +52,7 @@ fn encrypt_aes128(
             return Err(SsapError::InvalidKey);
         }
         let mut out: &mut [u8] = &mut [0; 16];
-        aes_ige(block, &mut out, &aes_key_r.unwrap(), iv, Mode::Encrypt);
+        aes_ige(block, &mut out, &aes_key_r.unwrap(), &mut iv, Mode::Encrypt);
         ciphertext.append(&mut Vec::from(out));
     }
 
@@ -56,10 +62,17 @@ fn encrypt_aes128(
 /// Decrypt ciphertext into plaintext using the provided key for decryption.
 /// The ciphertext must be a multiple of 16 bytes, otherwise an error is
 /// returned.
+///
+/// # Arguments
+/// * `ciphertext` - The ciphertext to decrypt
+/// * `key` - The key to use for decryption
+/// * `start_iv` - The initial vector to use for decryption
+/// # Returns
+/// * The plaintext
 fn decrypt_aes128(
     mut ciphertext: Vec<u8>,
     mut key: Vec<u8>,
-    start_iv: &mut [u8],
+    mut start_iv: Vec<u8>,
 ) -> Result<Vec<u8>, SsapError> {
 
     if ciphertext.len() % 16 != 0 {
@@ -77,7 +90,7 @@ fn decrypt_aes128(
             return Err(SsapError::InvalidKey);
         }
         let mut out: &mut [u8] = &mut [0; 16];
-        aes_ige(block, &mut out, &aes_key_r.unwrap(), start_iv, Mode::Decrypt);
+        aes_ige(block, &mut out, &aes_key_r.unwrap(), &mut start_iv, Mode::Decrypt);
         plaintext.append(&mut Vec::from(out));
     }
 
@@ -111,7 +124,7 @@ mod tests {
             b"\x12\x34\x56\x78\x90\x12\x34\x56\x12\x34\x56\x78\x90\x12\x34\x56".to_vec();
         let mut iv = b"\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F".to_vec();
 
-        let output = encrypt_aes128(plaintext, key, &mut iv);
+        let output = encrypt_aes128(plaintext, key, iv);
         assert_eq!(
             output.unwrap(),
             b"\xa6\xad\x97\x4d\x5c\xea\x1d\x36\xd2\xf3\x67\x98\x09\x07\xed\x32"
@@ -123,9 +136,9 @@ mod tests {
         let key = b"\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F".to_vec();
         let ciphertext =
             b"\xa6\xad\x97\x4d\x5c\xea\x1d\x36\xd2\xf3\x67\x98\x09\x07\xed\x32".to_vec();
-        let mut iv = b"\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F".to_vec();
+        let iv = b"\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F".to_vec();
 
-        let output = decrypt_aes128(ciphertext, key, &mut iv);
+        let output = decrypt_aes128(ciphertext, key, iv);
         assert_eq!(
             output.unwrap(),
             b"\x12\x34\x56\x78\x90\x12\x34\x56\x12\x34\x56\x78\x90\x12\x34\x56"
