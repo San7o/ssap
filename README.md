@@ -41,6 +41,6 @@ cargo fmt
     - generate passwords
 - v2.0
     - multiple encryption algorithms
-    - descrypt from url
+    - decrypt from url
     - 2fa?
     - **blazing speed**
