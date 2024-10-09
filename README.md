@@ -2,7 +2,7 @@
 
 ssap is a secure and **blazingly fast** password manager tool written in **Rust**.
 You can safely store, organize, generate and retrieve passwords from your
-local hard disk **blazingly quickly**. All the passwords will be stored in an encrypted form
+local hard disk **blazingly quickly**. All the passwords will be stored in an encrypted form.
 
 > Note: the project is currently in early developement and is changing **blazingly rapidly**
 
@@ -35,8 +35,12 @@ cargo fmt
 ```
 
 ## TODO
-- encrypt / decrypt
-- store / read from disk
-- multiple encryption algorithms
-- 2fa?
-- **blazing speed**
+- v1.0
+    - encrypt / decrypt
+    - store / read from disk
+    - generate passwords
+- v2.0
+    - multiple encryption algorithms
+    - descrypt from url
+    - 2fa?
+    - **blazing speed**
