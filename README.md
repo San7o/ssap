@@ -36,11 +36,11 @@ cargo fmt
 
 ## TODO
 - v1.0
-    -[x] encrypt / decrypt
-    - store / read from disk
-    - generate passwords
+    - [x] symmetric encrypt / decrypt
+    - [ ]store / read from disk
+    - [ ] generate passwords
 - v2.0
-    - multiple encryption algorithms
-    - decrypt from url
-    - 2fa?
-    - **blazing speed**
+    - [ ] asymmetric cryptography
+    - [ ] decrypt from url
+    - [ ] 2fa?
+    - [x] **blazing speed**
