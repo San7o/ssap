@@ -27,13 +27,13 @@ all
 pub mod ssap;
 use ssap::parse::parse;
 use ssap::ssap::Ssap;
+use ssap::run::run;
 use std::env::{args, Args};
 
 fn main() {
     let args: Args = std::env::args();
     let settings = parse(args);
-
-    println!("{:#?}", settings);
+    run(settings); 
 }
 
 fn help() {
