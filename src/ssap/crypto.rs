@@ -25,10 +25,20 @@ all
 */
 
 use crate::ssap::error::SsapError;
-use crate::ssap::ssap::{Ssap, Encryption};
-use openssl::aes::{aes_ige, AesKey, KeyError};
+use crate::ssap::ssap::{Encryption};
+use openssl::aes::{aes_ige, AesKey};
 use openssl::symm::{decrypt, encrypt, Cipher, Mode};
 
+/// Encrypt a password using the provided key and encryption algorithm.
+///
+/// # Arguments
+/// * `plaintext` - The password to encrypt
+/// * `key` - The key to use for encryption
+/// * `encryption` - The encryption algorithm to use
+/// # Returns
+/// * The encrypted password
+/// * An error if the encryption fails
+///
 pub fn encrypt_password(
     plaintext: Vec<u8>,
     key: Vec<u8>,
@@ -48,6 +58,16 @@ pub fn encrypt_password(
     Ok(out)
 }
 
+/// Decrypt a password using the provided key and encryption algorithm.
+///
+/// # Arguments
+/// * `ciphertext` - The password to decrypt
+/// * `key` - The key to use for decryption
+/// * `encryption` - The encryption algorithm to use
+/// # Returns
+/// * The decrypted password
+/// * An error if the decryption fails
+///
 pub fn decrypt_password(
     ciphertext: Vec<u8>,
     key: Vec<u8>,
@@ -58,7 +78,7 @@ pub fn decrypt_password(
     let iv = &ciphertext[0..16];
     let ciphertext = &ciphertext[16..];
     let padded_key = pad_key(key, 128);
-    let mut plaintext =
+    let plaintext =
         decrypt(cipher, &padded_key, Some(iv), &ciphertext).unwrap();
 
     let out = String::from_utf8(plaintext);
@@ -70,8 +90,8 @@ pub fn decrypt_password(
 
 fn get_cipher(encryption: &Encryption) -> Cipher {
     match encryption {
-        Encryption::aes_128_cbc => Cipher::aes_128_cbc(),
-        Encryption::aes_256_ccb => Cipher::aes_256_cbc(),
+        Encryption::Aes_128_cbc => Cipher::aes_128_cbc(),
+        Encryption::Aes_256_cbc => Cipher::aes_256_cbc(),
     }
 }
 
@@ -135,7 +155,7 @@ pub fn encrypt_aes128_ige(
 ///
 /// note: this function is depricated and should not be used
 pub fn decrypt_aes128_ige(
-    mut ciphertext: Vec<u8>,
+    ciphertext: Vec<u8>,
     mut key: Vec<u8>,
     mut start_iv: Vec<u8>,
 ) -> Result<Vec<u8>, SsapError> {

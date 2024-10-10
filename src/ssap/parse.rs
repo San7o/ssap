@@ -29,6 +29,13 @@ use crate::ssap::ssap::{Ssap, Encryption};
 use std::env::Args;
 use std::path::Path;
 
+/// Parse the command line arguments into a Ssap struct
+/// # Arguments
+/// * `args` - The command line arguments
+/// # Returns
+/// * A Ssap struct with the parsed arguments
+/// * An error if the arguments are invalid
+///
 pub fn parse(args: Args) -> Result<Ssap, SsapError> {
     let mut ssap = Ssap::default();
     let mut args = args.into_iter().skip(1);
@@ -66,10 +73,10 @@ pub fn parse(args: Args) -> Result<Ssap, SsapError> {
                 if let Some(encryption) = args.next() {
                     match encryption.as_str() {
                         "aes_128_cbc" => {
-                            ssap.encryption = Encryption::aes_128_cbc;
+                            ssap.encryption = Encryption::Aes_128_cbc;
                         }
                         "aes_256_ecb" => {
-                            ssap.encryption = Encryption::aes_256_ccb;
+                            ssap.encryption = Encryption::Aes_256_cbc;
                         }
                         _ => {
                             return Err(SsapError::InvalidEncryptionName);

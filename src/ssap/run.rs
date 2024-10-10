@@ -27,14 +27,19 @@ all
 use crate::ssap::crypto::{decrypt_password, encrypt_password};
 use crate::ssap::error::SsapError;
 use crate::ssap::ssap::Ssap;
-use hex::encode;
-use rpassword::prompt_password;
+use cli_clipboard;
 use std::fs;
 use std::fs::OpenOptions;
 use std::io::Write;
 use std::path::Path;
-use std::process::exit;
 
+/// Run the SSAP application
+///
+/// # Arguments
+/// * `settings` - The SSAP settings
+/// # Returns
+/// * A SsapError if the application fails
+///
 pub fn run(settings: Ssap) -> Result<(), SsapError> {
     if settings.show_help {
         help();
@@ -61,6 +66,10 @@ fn create_new(settings: Ssap) -> Result<(), SsapError> {
     }
 
     let input = settings.input.clone().unwrap();
+    if check_password_exists(&input, settings.path.clone()) {
+        return Err(SsapError::PasswordAlreadyRegistered);
+    }
+
     println!("Creating new password with name: {}", input);
     let new_passwd: String = generate_password()?;
     let key: String = read_passwd_pompt()?;
@@ -88,7 +97,6 @@ fn read_passwd_pompt() -> Result<String, SsapError> {
     Ok(passwd)
 }
 
-// TODO: do not create if the name already exists
 fn save_password(
     name: String,
     passwd: Vec<u8>,
@@ -98,7 +106,7 @@ fn save_password(
         "Saving password to file in path: {}",
         settings.path.display()
     );
-    let mut file = OpenOptions::new()
+    let file = OpenOptions::new()
         .write(true)
         .append(true)
         .create(true)
@@ -107,10 +115,28 @@ fn save_password(
         return Err(SsapError::InvalidPath);
     }
     let mut file = file.unwrap();
-    if let Err(e) = writeln!(&mut file, "{}: {}", name, hex::encode(passwd)) {
+    if let Err(_e) = writeln!(&mut file, "{}: {}", name, hex::encode(passwd)) {
         return Err(SsapError::InvalidWrite);
     }
     Ok(())
+}
+
+fn check_password_exists(name: &String, path: Box<Path>) -> bool {
+    let file = fs::read_to_string(path);
+    if file.is_err() {
+        return false;
+    }
+
+    for line in file.unwrap().lines() {
+        let mut parts = line.split(": ");
+        if let Some(n) = parts.next() {
+            if n == name {
+                return true;
+            }
+        }
+    }
+
+    false
 }
 
 fn get_passwd(settings: Ssap) -> Result<(), SsapError> {
@@ -127,8 +153,8 @@ fn get_passwd(settings: Ssap) -> Result<(), SsapError> {
         println!("Decrypted Password: {}", decrypted_password);
     }
     if settings.copy_to_clipboard {
-        // copy_to_clipboard(decrypted_password)?;
-        // TODO
+        println!("Copying password to clipboard");
+        copy_to_clipboard(decrypted_password)?;
     }
 
     Ok(())
@@ -154,6 +180,19 @@ fn read_password(name: String, path: Box<Path>) -> Result<Vec<u8>, SsapError> {
         }
     }
     Err(SsapError::PasswordNameNotFound)
+}
+
+fn copy_to_clipboard(password: String) -> Result<(), SsapError> {
+    if let Err(_e) = cli_clipboard::set_contents(password.clone()) {
+        return Err(SsapError::ErrorSavingClipboard);
+    }
+    if cli_clipboard::get_contents().is_err() {
+        return Err(SsapError::ErrorSavingClipboard);
+    }
+    if cli_clipboard::get_contents().unwrap() != password {
+        return Err(SsapError::ErrorSavingClipboard);
+    }
+    Ok(())
 }
 
 fn delete(settings: Ssap) -> Result<(), SsapError> {
@@ -183,7 +222,7 @@ fn delete(settings: Ssap) -> Result<(), SsapError> {
     if !found {
         return Err(SsapError::PasswordNameNotFound);
     }
-    let mut file = OpenOptions::new()
+    let file = OpenOptions::new()
         .write(true)
         .truncate(true)
         .open(settings.path.clone());
@@ -191,7 +230,7 @@ fn delete(settings: Ssap) -> Result<(), SsapError> {
         return Err(SsapError::InvalidPath);
     }
     let mut file = file.unwrap();
-    if let Err(e) = write!(&mut file, "{}", new_file) {
+    if let Err(_e) = write!(&mut file, "{}", new_file) {
         return Err(SsapError::InvalidWrite);
     }
     Ok(())
@@ -237,7 +276,7 @@ fn help() {
     println!("    -s, --silent       Do not print the generated password");
     println!("    -p, --path <path>  Specify the path to the password file");
     println!("    -e, --encryption <encryption> Specify the encryption algorithm");
-    println!("                       Supported algorithms: aes_128_cbc, aes_256_ecb");
+    println!("                       Supported algorithms: aes_128_cbc, aes_256_cbc");
     println!();
     println!("OPTIONS:");
     println!("    new               Create a new password");

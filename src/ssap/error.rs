@@ -35,8 +35,10 @@ pub enum SsapError {
     InvalidEncryptionName,
     InvalidCommand,
     PasswordMismatch,
+    PasswordAlreadyRegistered,
     MissingPasswordName,
     MissingPath,
     ErrorDecrypting,
+    ErrorSavingClipboard,
     PasswordNameNotFound,
 }

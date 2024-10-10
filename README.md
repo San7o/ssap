@@ -20,7 +20,7 @@ FLAGS:
     -s, --silent       Do not print the generated password
     -p, --path <path>  Specify the path to the password file
     -e, --encryption <encryption> Specify the encryption algorithm
-                       Supported algorithms: aes_128_cbc, aes_256_ecb
+                       Supported algorithms: aes_128_cbc, aes_256_cbc
 
 OPTIONS:
     new               Create a new password

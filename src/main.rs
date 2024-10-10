@@ -23,12 +23,12 @@ all
 * SOFTWARE.
 *
 */
+#[allow(non_camel_case_types)]
 
 pub mod ssap;
 use ssap::parse::parse;
 use ssap::run::run;
-use ssap::ssap::Ssap;
-use std::env::{args, Args};
+use std::env::{Args};
 
 fn main() {
     let args: Args = std::env::args();
