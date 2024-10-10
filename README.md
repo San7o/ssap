@@ -21,8 +21,8 @@ OPTIONS:
     list              List all registered passwords
 
 INPUT:
-    The name of the password to create or get. The password
-    itself will be prompted for.
+    The name of the password to create or get to query
+    the real encrypted password.
 
 FLAGS:
     -h, --help         Prints help information

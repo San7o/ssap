@@ -294,8 +294,8 @@ fn help() {
     println!("    list              List all registered passwords");
     println!();
     println!("INPUT:");
-    println!("    The name of the password to create or get. The password");
-    println!("    itself will be prompted for.");
+    println!("    The name of the password to create or get to query the"); 
+    println!("    real encrypted password.");
     println!();
     println!("FLAGS:");
     println!("    -h, --help         Prints help information");
