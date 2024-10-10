@@ -296,6 +296,8 @@ fn help() {
     println!(
         "                       Supported algorithms: aes_128_cbc, aes_256_cbc"
     );
+    println!("    -l, --length <length> Specify the length of the generated password");
+    println!("                          default: 30");
     println!();
     println!("OPTIONS:");
     println!("    new               Create a new password");

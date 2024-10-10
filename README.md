@@ -21,6 +21,8 @@ FLAGS:
     -p, --path <path>  Specify the path to the password file
     -e, --encryption <encryption> Specify the encryption algorithm
                        Supported algorithms: aes_128_cbc, aes_256_cbc
+    -l, --length <length> Specify the length of the generated password
+                          default: 30
 
 OPTIONS:
     new               Create a new password
@@ -77,5 +79,5 @@ cargo fmt
     - [x] symmetric encrypt / decrypt
     - [x] store / read / delete from disk
     - [x] multiple encryption algorithms
-    - [ ] generate passwords and iv
+    - [x] generate random passwords and iv
     - [ ] proper testing
