@@ -1,32 +1,32 @@
 /*
- * MIT License
- *
- * Copyright (c) 2024 Giovanni Santini
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- *
- */
+* MIT License
+*
+* Copyright (c) 2024 Giovanni Santini
+*
+* Permission is hereby granted, free of charge, to any person obtaining a copy
+* of this software and associated documentation files (the "Software"), to deal
+* in the Software without restriction, including without limitation the rights
+* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the Software is
+* furnished to do so, subject to the following conditions:
+*
+* The above copyright notice and this permission notice shall be included in
+all
+* copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+* SOFTWARE.
+*
+*/
 
+use crate::ssap::error::SsapError;
 use openssl::aes::{aes_ige, AesKey, KeyError};
 use openssl::symm::Mode;
-use crate::ssap::error::SsapError;
 
 /// Encrypt an arbitrary number of bytes into a cypher text with the same
 /// length using the provided key for encryption.
@@ -83,7 +83,6 @@ pub fn decrypt_aes128_ige(
     mut key: Vec<u8>,
     mut start_iv: Vec<u8>,
 ) -> Result<Vec<u8>, SsapError> {
-
     if ciphertext.len() % 16 != 0 {
         return Err(SsapError::InvalidCiphertext);
     }
@@ -99,7 +98,13 @@ pub fn decrypt_aes128_ige(
             return Err(SsapError::InvalidKey);
         }
         let mut out: &mut [u8] = &mut [0; 16];
-        aes_ige(block, &mut out, &aes_key_r.unwrap(), &mut start_iv, Mode::Decrypt);
+        aes_ige(
+            block,
+            &mut out,
+            &aes_key_r.unwrap(),
+            &mut start_iv,
+            Mode::Decrypt,
+        );
         plaintext.append(&mut Vec::from(out));
     }
 
