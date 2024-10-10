@@ -44,8 +44,6 @@ ssap is a secure and **blazingly fast** password manager tool written in **Rust*
 You can safely store, organize, generate and retrieve passwords from your
 local disk **blazingly quickly**. All the passwords will be stored in an encrypted form.
 
-> Note: the project is currently in early developement and is changing **blazingly rapidly**
-
 ## saap is:
 
 - **secure**: written in Rust, but using battle tested encryption libraries (openssl) written in **C**
@@ -73,11 +71,3 @@ Format code:
 ```bash
 cargo fmt
 ```
-
-## TODO
-- v1.0
-    - [x] symmetric encrypt / decrypt
-    - [x] store / read / delete from disk
-    - [x] multiple encryption algorithms
-    - [x] generate random passwords and iv
-    - [ ] proper testing

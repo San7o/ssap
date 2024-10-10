@@ -86,7 +86,7 @@ pub fn parse(args: Args) -> Result<Ssap, SsapError> {
                         "aes_128_cbc" => {
                             ssap.encryption = Encryption::Aes_128_cbc;
                         }
-                        "aes_256_ecb" => {
+                        "aes_256_cbc" => {
                             ssap.encryption = Encryption::Aes_256_cbc;
                         }
                         _ => {

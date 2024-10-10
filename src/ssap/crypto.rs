@@ -47,7 +47,7 @@ pub fn encrypt_password(
 ) -> Result<Vec<u8>, SsapError> {
     let cipher = get_cipher(&encryption);
     let iv = generate_random_iv()?;
-    let padded_key = pad_key(key, 128);
+    let padded_key = pad_key(key, &encryption);
     let mut ciphertext =
         encrypt(cipher, &padded_key, Some(&iv), &plaintext).unwrap();
 
@@ -74,7 +74,7 @@ pub fn decrypt_password(
     let cipher = get_cipher(&encryption);
     let iv = &ciphertext[0..16];
     let ciphertext = &ciphertext[16..];
-    let padded_key = pad_key(key, 128);
+    let padded_key = pad_key(key, &encryption);
     let plaintext =
         decrypt(cipher, &padded_key, Some(iv), &ciphertext).unwrap();
 
@@ -92,7 +92,11 @@ fn get_cipher(encryption: &Encryption) -> Cipher {
     }
 }
 
-fn pad_key(key: Vec<u8>, n_bits: usize) -> Vec<u8> {
+fn pad_key(key: Vec<u8>, encryption: &Encryption) -> Vec<u8> {
+    let n_bits = match encryption {
+        Encryption::Aes_128_cbc => 128,
+        Encryption::Aes_256_cbc => 256,
+    };
     let mut padded_key = key.clone();
     let n = n_bits / 8;
     if key.len() != n {
@@ -197,6 +201,20 @@ mod tests {
     use super::*;
 
     #[test]
+    fn test_pad_key() {
+        let key = vec![0x01, 0x02, 0x03, 0x04];
+        let padded_key = pad_key(key, &Encryption::Aes_128_cbc);
+        assert_eq!(padded_key.len(), 16);
+        assert_eq!(padded_key, vec![0x01, 0x02, 0x03, 0x04, 0,0,0,0,0,0,0,0,0,0,0,0]);
+
+        let key = vec![0x01, 0x02, 0x03, 0x04];
+        let padded_key = pad_key(key, &Encryption::Aes_256_cbc);
+        assert_eq!(padded_key.len(), 32);
+        assert_eq!(padded_key, vec![0x01, 0x02, 0x03, 0x04,
+                   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
+    }
+
+    #[test]
     fn test_encrypt_aes128_ige() {
         let key =
             b"\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F"
@@ -204,7 +222,7 @@ mod tests {
         let plaintext =
             b"\x12\x34\x56\x78\x90\x12\x34\x56\x12\x34\x56\x78\x90\x12\x34\x56"
                 .to_vec();
-        let mut iv = b"\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F".to_vec();
+        let iv = b"\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F".to_vec();
 
         let output = encrypt_aes128_ige(plaintext, key, iv);
         assert_eq!(

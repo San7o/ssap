@@ -26,7 +26,6 @@ all
 
 use std::path::Path;
 
-// TODO: add more encryption algorithms
 /// List of supported encryption algorithms
 #[derive(Debug, Clone)]
 pub enum Encryption {
