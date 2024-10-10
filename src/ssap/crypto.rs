@@ -25,8 +25,67 @@ all
 */
 
 use crate::ssap::error::SsapError;
+use crate::ssap::ssap::Ssap;
 use openssl::aes::{aes_ige, AesKey, KeyError};
-use openssl::symm::Mode;
+use openssl::symm::{Mode, Cipher, encrypt, decrypt};
+
+pub fn encrypt_password(
+    plaintext: Vec<u8>,
+    key: Vec<u8>,
+    settings: &Ssap, // TODO: pass only the cipher
+) -> Result<Vec<u8>, SsapError> {
+
+    // TODO: select cipher in settings
+
+    let cipher = Cipher::aes_128_cbc();
+    // TODO: generate random iv
+    let iv = b"\x00\x01\x02\x03\x04\x05\x06\x07\x00\x01\x02\x03\x04\x05\x06\x07";
+    let padded_key = pad_key(key, 128);
+    let mut ciphertext = encrypt(
+        cipher,
+        &padded_key,
+        Some(iv),
+        &plaintext).unwrap();
+
+    let mut out = iv.clone().to_vec();
+    out.append(&mut ciphertext);
+    Ok(out)
+}
+
+pub fn decrypt_password(
+    ciphertext: Vec<u8>,
+    key: Vec<u8>,
+    settings: &Ssap, // TODO: pass only the cipher
+) -> Result<String, SsapError> {
+
+    // TODO: select cipher in settings
+
+    let cipher = Cipher::aes_128_cbc();
+    let iv = &ciphertext[0..16];
+    let ciphertext = &ciphertext[16..];
+    let padded_key = pad_key(key, 128);
+    let mut plaintext = decrypt(
+        cipher,
+        &padded_key,
+        Some(iv),
+        &ciphertext).unwrap();
+
+    let out = String::from_utf8(plaintext);
+    if out.is_err() {
+        return Err(SsapError::ErrorDecrypting);
+    }
+    Ok(out.unwrap())
+}
+
+
+fn pad_key(key: Vec<u8>, n_bits: usize) -> Vec<u8> {
+    let mut padded_key = key.clone();
+    let n = n_bits / 8;
+    if key.len() != n {
+        padded_key.resize(n, 0 as u8);
+    }
+    padded_key
+}
 
 /// Encrypt an arbitrary number of bytes into a cypher text with the same
 /// length using the provided key for encryption.
@@ -117,9 +176,12 @@ mod tests {
 
     #[test]
     fn test_encrypt_aes128_ige() {
-        let key = b"\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F".to_vec();
+        let key =
+            b"\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F"
+                .to_vec();
         let plaintext =
-            b"\x12\x34\x56\x78\x90\x12\x34\x56\x12\x34\x56\x78\x90\x12\x34\x56".to_vec();
+            b"\x12\x34\x56\x78\x90\x12\x34\x56\x12\x34\x56\x78\x90\x12\x34\x56"
+                .to_vec();
         let mut iv = b"\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F".to_vec();
 
         let output = encrypt_aes128_ige(plaintext, key, iv);
@@ -131,9 +193,12 @@ mod tests {
 
     #[test]
     fn test_decrypt_aes_128_ige() {
-        let key = b"\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F".to_vec();
+        let key =
+            b"\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F"
+                .to_vec();
         let ciphertext =
-            b"\xa6\xad\x97\x4d\x5c\xea\x1d\x36\xd2\xf3\x67\x98\x09\x07\xed\x32".to_vec();
+            b"\xa6\xad\x97\x4d\x5c\xea\x1d\x36\xd2\xf3\x67\x98\x09\x07\xed\x32"
+                .to_vec();
         let iv = b"\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F".to_vec();
 
         let output = decrypt_aes128_ige(ciphertext, key, iv);

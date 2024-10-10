@@ -1,7 +1,33 @@
-use crate::ssap::ssap::Ssap;
+/*
+* MIT License
+*
+* Copyright (c) 2024 Giovanni Santini
+*
+* Permission is hereby granted, free of charge, to any person obtaining a copy
+* of this software and associated documentation files (the "Software"), to deal
+* in the Software without restriction, including without limitation the rights
+* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the Software is
+* furnished to do so, subject to the following conditions:
+*
+* The above copyright notice and this permission notice shall be included in
+all
+* copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+* SOFTWARE.
+*
+*/
+
 use crate::ssap::error::SsapError;
-use std::path::Path;
+use crate::ssap::ssap::Ssap;
 use std::env::Args;
+use std::path::Path;
 
 pub fn parse(args: Args) -> Result<Ssap, SsapError> {
     let mut ssap = Ssap::default();
@@ -11,17 +37,17 @@ pub fn parse(args: Args) -> Result<Ssap, SsapError> {
             "-h" | "--help" | "help" => {
                 ssap.show_help = true;
             }
-            "new" => {
-                ssap.create_new = true;
-            }
             "get" => {
                 ssap.get_passwd = true;
             }
-            "generate" => {
-                ssap.generate = true;
+            "new" => {
+                ssap.create_new = true;
             }
             "delete" => {
                 ssap.delete_passwd = true;
+            }
+            "list" => {
+                ssap.list = true;
             }
             "-c" | "--clipboard" => {
                 ssap.copy_to_clipboard = true;
@@ -32,8 +58,7 @@ pub fn parse(args: Args) -> Result<Ssap, SsapError> {
             "-p" | "--path" => {
                 if let Some(path) = args.next() {
                     ssap.path = Path::new(&path.clone()).into();
-                }
-                else {
+                } else {
                     return Err(SsapError::MissingPath);
                 }
             }

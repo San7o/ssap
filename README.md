@@ -1,15 +1,14 @@
 # ssap - simply secure all passwords
 
 ```
- ________  ________  ________  ________
-|\   ____\|\   __  \|\   __  \|\   __  \
-\ \  \___|\ \  \|\  \ \  \|\  \ \  \|\  \
- \ \_____  \ \   __  \ \   __  \ \   ____\
-  \|____|\  \ \  \ \  \ \  \ \  \ \  \___|
-    ____\_\  \ \__\ \__\ \__\ \__\ \__\
-   |\_________\|__|\|__|\|__|\|__|\|__|
-   \|_________|
-
+ ________   ________  ________  ________
+|\   ____\ |\   ____\|\   __  \|\   __  \
+\ \  \___|_\ \  \___|\ \  \|\  \ \  \|\  \
+ \ \_____  \\ \_____  \ \   __  \ \   ____\
+  \|____|\  \\|____|\  \ \  \ \  \ \  \___|
+    ____\_\  \ ____\_\  \ \__\ \__\ \__\
+   |\_________\\_________\|__|\|__|\|__|
+   \|_________\|_________|
 
 USAGE:
     ssap [OPTIONS] [INPUT] [FLAGS]
@@ -22,8 +21,8 @@ FLAGS:
 OPTIONS:
     new               Create a new password
     get               Get an existing password
-    generate          Generate a new password
     delete            Delete an existing password
+    list              List all registered passwords
 
 INPUT:
     The name of the password to create or get. The password
@@ -71,10 +70,10 @@ cargo fmt
 
 ## TODO
 - v1.0
-    - [ ] symmetric encrypt / decrypt
+    - [x] symmetric encrypt / decrypt
     - [x] store / read from disk
-    - [ ] generate passwords
-    - [ ] backup decryption
+    - [ ] generate passwords and iv
+    - [ ] multiple encryption algorithms
 - v2.0
     - [ ] asymmetric cryptography
     - [ ] decrypt from url

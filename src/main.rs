@@ -26,8 +26,8 @@ all
 
 pub mod ssap;
 use ssap::parse::parse;
-use ssap::ssap::Ssap;
 use ssap::run::run;
+use ssap::ssap::Ssap;
 use std::env::{args, Args};
 
 fn main() {
