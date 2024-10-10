@@ -99,6 +99,15 @@ ssap delete linkedin --path ~/.my_secure_store
 > Password delete successfully
 ```
 
+## Security tip
+For even mor security, you can change the permissions of the password file
+on linux with the following file:
+```bash
+chmod o-wr ./.my_secure_file
+```
+This way, no other user will be able to read or write to it, adding an
+additional layer of security in your system.
+
 ## Developmement
 Run tests:
 ```bash
