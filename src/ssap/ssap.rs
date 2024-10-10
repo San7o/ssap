@@ -45,6 +45,7 @@ pub struct Ssap {
     pub copy_to_clipboard: bool,
     pub silent: bool,
     pub input: Option<String>,
+    pub password_len: usize,
     pub path: Box<Path>,
     pub encryption: Encryption,
 }
@@ -61,6 +62,7 @@ impl Ssap {
             copy_to_clipboard: false,
             silent: false,
             input: None,
+            password_len: 30,
             path: Path::new("./.ssap.enc").into(),
             encryption: Encryption::Aes_128_cbc,
         }

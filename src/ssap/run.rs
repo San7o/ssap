@@ -71,7 +71,8 @@ fn create_new(settings: Ssap) -> Result<(), SsapError> {
     }
 
     println!("Creating new password with name: {}", input);
-    let new_passwd: String = generate_password()?;
+    let new_passwd: String = generate_password(settings.password_len);
+    println!("Generated Password: {}", new_passwd);
     let key: String = read_passwd_pompt()?;
     let encrypted_passwd =
         encrypt_password(new_passwd.into(), key.into(), &settings.encryption)?;
@@ -81,17 +82,31 @@ fn create_new(settings: Ssap) -> Result<(), SsapError> {
     Ok(())
 }
 
-fn generate_password() -> Result<String, SsapError> {
-    // TODO
-    Ok("password".to_string())
+fn generate_password(size: usize) -> String {
+    let charset = "abcdefghijklmnopqrstuvwxyz\
+                   ABCDEFGHIJKLMNOPQRSTUVWXYZ\
+                   0123456789\
+                   !@#$%^&()={}[]?";
+    let mut password = String::new();
+    for _ in 0..(size as i64) {
+        let idx = rand::random::<usize>() % charset.len();
+        password.push(charset.chars().nth(idx).unwrap());
+    }
+    password
 }
 
 fn read_passwd_pompt() -> Result<String, SsapError> {
     std::io::stdout().flush().unwrap();
-    let passwd = rpassword::prompt_password("Enter vault password: ").unwrap();
-    let passwd2 =
-        rpassword::prompt_password("Re-enter vault password: ").unwrap();
-    if passwd != passwd2 {
+    let passwd = rpassword::prompt_password("Enter vault password: ");
+    if passwd.is_err() {
+        return Err(SsapError::InvalidPassword);
+    }
+    let passwd2 = rpassword::prompt_password("Re-enter vault password: ");
+    if passwd2.is_err() {
+        return Err(SsapError::InvalidPassword);
+    }
+    let passwd = passwd.unwrap();
+    if passwd != passwd2.unwrap() {
         return Err(SsapError::PasswordMismatch);
     }
     Ok(passwd)
@@ -275,8 +290,12 @@ fn help() {
     println!("    -c, --clipboard    Copy the generated password to clipboard");
     println!("    -s, --silent       Do not print the generated password");
     println!("    -p, --path <path>  Specify the path to the password file");
-    println!("    -e, --encryption <encryption> Specify the encryption algorithm");
-    println!("                       Supported algorithms: aes_128_cbc, aes_256_cbc");
+    println!(
+        "    -e, --encryption <encryption> Specify the encryption algorithm"
+    );
+    println!(
+        "                       Supported algorithms: aes_128_cbc, aes_256_cbc"
+    );
     println!();
     println!("OPTIONS:");
     println!("    new               Create a new password");

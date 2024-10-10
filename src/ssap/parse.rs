@@ -25,7 +25,7 @@ all
 */
 
 use crate::ssap::error::SsapError;
-use crate::ssap::ssap::{Ssap, Encryption};
+use crate::ssap::ssap::{Encryption, Ssap};
 use std::env::Args;
 use std::path::Path;
 
@@ -61,6 +61,17 @@ pub fn parse(args: Args) -> Result<Ssap, SsapError> {
             }
             "-s" | "--silent" => {
                 ssap.silent = true;
+            }
+            "-l" | "--length" => {
+                if let Some(length) = args.next() {
+                    if let Ok(length) = length.parse::<usize>() {
+                        ssap.password_len = length;
+                    } else {
+                        return Err(SsapError::InvalidPasswordLength);
+                    }
+                } else {
+                    return Err(SsapError::MissingPasswordLength);
+                }
             }
             "-p" | "--path" => {
                 if let Some(path) = args.next() {

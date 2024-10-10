@@ -78,3 +78,4 @@ cargo fmt
     - [x] store / read / delete from disk
     - [x] multiple encryption algorithms
     - [ ] generate passwords and iv
+    - [ ] proper testing

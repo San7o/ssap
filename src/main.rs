@@ -24,21 +24,20 @@ all
 *
 */
 #[allow(non_camel_case_types)]
-
 pub mod ssap;
 use ssap::parse::parse;
 use ssap::run::run;
-use std::env::{Args};
+use std::env::Args;
 
 fn main() {
     let args: Args = std::env::args();
     let settings = parse(args);
     if settings.is_err() {
-        eprintln!("Error: {:?}", settings.err().unwrap());
+        eprintln!("Error: {}", settings.err().unwrap());
         std::process::exit(1);
     }
     if let Err(e) = run(settings.unwrap()) {
-        eprintln!("Error: {:?}", e);
+        eprintln!("Error: {}", e);
         std::process::exit(1);
     }
 }

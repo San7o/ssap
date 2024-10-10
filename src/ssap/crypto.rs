@@ -25,9 +25,10 @@ all
 */
 
 use crate::ssap::error::SsapError;
-use crate::ssap::ssap::{Encryption};
+use crate::ssap::ssap::Encryption;
 use openssl::aes::{aes_ige, AesKey};
 use openssl::symm::{decrypt, encrypt, Cipher, Mode};
+use rand::RngCore;
 
 /// Encrypt a password using the provided key and encryption algorithm.
 ///
@@ -44,14 +45,11 @@ pub fn encrypt_password(
     key: Vec<u8>,
     encryption: &Encryption,
 ) -> Result<Vec<u8>, SsapError> {
-
     let cipher = get_cipher(&encryption);
-    // TODO: generate random iv
-    let iv =
-        b"\x00\x01\x02\x03\x04\x05\x06\x07\x00\x01\x02\x03\x04\x05\x06\x07";
+    let iv = generate_random_iv()?;
     let padded_key = pad_key(key, 128);
     let mut ciphertext =
-        encrypt(cipher, &padded_key, Some(iv), &plaintext).unwrap();
+        encrypt(cipher, &padded_key, Some(&iv), &plaintext).unwrap();
 
     let mut out = iv.clone().to_vec();
     out.append(&mut ciphertext);
@@ -73,7 +71,6 @@ pub fn decrypt_password(
     key: Vec<u8>,
     encryption: &Encryption,
 ) -> Result<String, SsapError> {
-
     let cipher = get_cipher(&encryption);
     let iv = &ciphertext[0..16];
     let ciphertext = &ciphertext[16..];
@@ -102,6 +99,14 @@ fn pad_key(key: Vec<u8>, n_bits: usize) -> Vec<u8> {
         padded_key.resize(n, 0 as u8);
     }
     padded_key
+}
+
+fn generate_random_iv() -> Result<[u8; 16], SsapError> {
+    let mut iv = [0u8; 16];
+    if let Err(_e) = rand::thread_rng().try_fill_bytes(&mut iv) {
+        return Err(SsapError::ErrorGeneratingIV);
+    }
+    Ok(iv)
 }
 
 /// Encrypt an arbitrary number of bytes into a cypher text with the same
