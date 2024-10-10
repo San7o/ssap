@@ -70,14 +70,14 @@ fn create_new(settings: Ssap) -> Result<(), SsapError> {
         return Err(SsapError::PasswordAlreadyRegistered);
     }
 
-    println!("Creating new password with name: {}", input);
+    println!("> Creating new password with name: {}", input);
     let new_passwd: String = generate_password(settings.password_len);
-    println!("Generated Password: {}", new_passwd);
+    println!("> Generated Password: {}", new_passwd);
     let key: String = read_passwd_pompt()?;
     let encrypted_passwd =
         encrypt_password(new_passwd.into(), key.into(), &settings.encryption)?;
     save_password(input, encrypted_passwd, &settings)?;
-    println!("Password created successfully");
+    println!("> Password created successfully");
 
     Ok(())
 }
@@ -97,11 +97,11 @@ fn generate_password(size: usize) -> String {
 
 fn read_passwd_pompt() -> Result<String, SsapError> {
     std::io::stdout().flush().unwrap();
-    let passwd = rpassword::prompt_password("Enter vault password: ");
+    let passwd = rpassword::prompt_password("> Enter vault password: ");
     if passwd.is_err() {
         return Err(SsapError::InvalidPassword);
     }
-    let passwd2 = rpassword::prompt_password("Re-enter vault password: ");
+    let passwd2 = rpassword::prompt_password("> Re-enter vault password: ");
     if passwd2.is_err() {
         return Err(SsapError::InvalidPassword);
     }
@@ -118,7 +118,7 @@ fn save_password(
     settings: &Ssap,
 ) -> Result<(), SsapError> {
     println!(
-        "Saving password to file in path: {}",
+        "> Saving password to file in path: {}",
         settings.path.display()
     );
     let file = OpenOptions::new()
@@ -165,10 +165,10 @@ fn get_passwd(settings: Ssap) -> Result<(), SsapError> {
     let decrypted_password =
         decrypt_password(encrypted_password, key.into(), &settings.encryption)?;
     if !settings.silent {
-        println!("Decrypted Password: {}", decrypted_password);
+        println!("> Decrypted Password: {}", decrypted_password);
     }
     if settings.copy_to_clipboard {
-        println!("Copying password to clipboard");
+        println!("> Copying password to clipboard");
         copy_to_clipboard(decrypted_password)?;
     }
 
@@ -248,6 +248,8 @@ fn delete(settings: Ssap) -> Result<(), SsapError> {
     if let Err(_e) = write!(&mut file, "{}", new_file) {
         return Err(SsapError::InvalidWrite);
     }
+
+    println!("> Password deleted successfully");
     Ok(())
 }
 
@@ -257,11 +259,11 @@ fn list(settings: Ssap) -> Result<(), SsapError> {
         return Err(SsapError::InvalidPath);
     }
 
-    println!("List of registered passwords:");
+    println!("> List of registered passwords:");
     for line in file.unwrap().lines() {
         let mut parts = line.split(": ");
         if let Some(n) = parts.next() {
-            println!(" - {}", n);
+            println!(">  - {}", n);
         }
     }
     Ok(())
@@ -285,6 +287,16 @@ fn help() {
     println!("USAGE:");
     println!("    ssap [OPTIONS] [INPUT] [FLAGS]");
     println!();
+    println!("OPTIONS:");
+    println!("    new               Create a new password");
+    println!("    get               Get an existing password");
+    println!("    delete            Delete an existing password");
+    println!("    list              List all registered passwords");
+    println!();
+    println!("INPUT:");
+    println!("    The name of the password to create or get. The password");
+    println!("    itself will be prompted for.");
+    println!();
     println!("FLAGS:");
     println!("    -h, --help         Prints help information");
     println!("    -c, --clipboard    Copy the generated password to clipboard");
@@ -298,16 +310,6 @@ fn help() {
     );
     println!("    -l, --length <length> Specify the length of the generated password");
     println!("                          default: 30");
-    println!();
-    println!("OPTIONS:");
-    println!("    new               Create a new password");
-    println!("    get               Get an existing password");
-    println!("    delete            Delete an existing password");
-    println!("    list              List all registered passwords");
-    println!();
-    println!("INPUT:");
-    println!("    The name of the password to create or get. The password");
-    println!("    itself will be prompted for.");
     println!();
     println!("EXAMPLES:");
     println!("    ssap new my_password");
