@@ -32,10 +32,11 @@ pub enum SsapError {
     InvalidWrite,
     InvalidPath,
     InvalidPasswordName,
+    InvalidEncryptionName,
     InvalidCommand,
     PasswordMismatch,
     MissingPasswordName,
     MissingPath,
     ErrorDecrypting,
-    PasswordNameNotFound
+    PasswordNameNotFound,
 }

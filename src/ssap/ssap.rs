@@ -26,6 +26,13 @@ all
 
 use std::path::Path;
 
+/// List of supported encryption algorithms
+#[derive(Debug, Clone)]
+pub enum Encryption {
+    aes_128_cbc,
+    aes_256_ccb,
+}
+
 /// Struct holding SSAP settings
 #[derive(Debug, Clone)]
 pub struct Ssap {
@@ -38,6 +45,7 @@ pub struct Ssap {
     pub silent: bool,
     pub input: Option<String>,
     pub path: Box<Path>,
+    pub encryption: Encryption,
 }
 
 impl Ssap {
@@ -53,6 +61,7 @@ impl Ssap {
             silent: false,
             input: None,
             path: Path::new("./.ssap.enc").into(),
+            encryption: Encryption::aes_128_cbc,
         }
     }
 }

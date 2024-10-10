@@ -25,27 +25,23 @@ all
 */
 
 use crate::ssap::error::SsapError;
-use crate::ssap::ssap::Ssap;
+use crate::ssap::ssap::{Ssap, Encryption};
 use openssl::aes::{aes_ige, AesKey, KeyError};
-use openssl::symm::{Mode, Cipher, encrypt, decrypt};
+use openssl::symm::{decrypt, encrypt, Cipher, Mode};
 
 pub fn encrypt_password(
     plaintext: Vec<u8>,
     key: Vec<u8>,
-    settings: &Ssap, // TODO: pass only the cipher
+    encryption: &Encryption,
 ) -> Result<Vec<u8>, SsapError> {
 
-    // TODO: select cipher in settings
-
-    let cipher = Cipher::aes_128_cbc();
+    let cipher = get_cipher(&encryption);
     // TODO: generate random iv
-    let iv = b"\x00\x01\x02\x03\x04\x05\x06\x07\x00\x01\x02\x03\x04\x05\x06\x07";
+    let iv =
+        b"\x00\x01\x02\x03\x04\x05\x06\x07\x00\x01\x02\x03\x04\x05\x06\x07";
     let padded_key = pad_key(key, 128);
-    let mut ciphertext = encrypt(
-        cipher,
-        &padded_key,
-        Some(iv),
-        &plaintext).unwrap();
+    let mut ciphertext =
+        encrypt(cipher, &padded_key, Some(iv), &plaintext).unwrap();
 
     let mut out = iv.clone().to_vec();
     out.append(&mut ciphertext);
@@ -55,20 +51,15 @@ pub fn encrypt_password(
 pub fn decrypt_password(
     ciphertext: Vec<u8>,
     key: Vec<u8>,
-    settings: &Ssap, // TODO: pass only the cipher
+    encryption: &Encryption,
 ) -> Result<String, SsapError> {
 
-    // TODO: select cipher in settings
-
-    let cipher = Cipher::aes_128_cbc();
+    let cipher = get_cipher(&encryption);
     let iv = &ciphertext[0..16];
     let ciphertext = &ciphertext[16..];
     let padded_key = pad_key(key, 128);
-    let mut plaintext = decrypt(
-        cipher,
-        &padded_key,
-        Some(iv),
-        &ciphertext).unwrap();
+    let mut plaintext =
+        decrypt(cipher, &padded_key, Some(iv), &ciphertext).unwrap();
 
     let out = String::from_utf8(plaintext);
     if out.is_err() {
@@ -77,6 +68,12 @@ pub fn decrypt_password(
     Ok(out.unwrap())
 }
 
+fn get_cipher(encryption: &Encryption) -> Cipher {
+    match encryption {
+        Encryption::aes_128_cbc => Cipher::aes_128_cbc(),
+        Encryption::aes_256_ccb => Cipher::aes_256_cbc(),
+    }
+}
 
 fn pad_key(key: Vec<u8>, n_bits: usize) -> Vec<u8> {
     let mut padded_key = key.clone();

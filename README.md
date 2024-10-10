@@ -10,6 +10,7 @@
    |\_________\\_________\|__|\|__|\|__|
    \|_________\|_________|
 
+
 USAGE:
     ssap [OPTIONS] [INPUT] [FLAGS]
 
@@ -18,6 +19,9 @@ FLAGS:
     -c, --clipboard    Copy the generated password to clipboard
     -s, --silent       Do not print the generated password
     -p, --path <path>  Specify the path to the password file
+    -e, --encryption <encryption> Specify the encryption algorithm
+                       Supported algorithms: aes_128_cbc, aes_256_ecb
+
 OPTIONS:
     new               Create a new password
     get               Get an existing password
@@ -71,11 +75,6 @@ cargo fmt
 ## TODO
 - v1.0
     - [x] symmetric encrypt / decrypt
-    - [x] store / read from disk
+    - [x] store / read / delete from disk
+    - [x] multiple encryption algorithms
     - [ ] generate passwords and iv
-    - [ ] multiple encryption algorithms
-- v2.0
-    - [ ] asymmetric cryptography
-    - [ ] decrypt from url
-    - [ ] 2fa?
-    - [x] **blazing speed**

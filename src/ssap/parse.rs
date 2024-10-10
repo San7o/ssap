@@ -25,7 +25,7 @@ all
 */
 
 use crate::ssap::error::SsapError;
-use crate::ssap::ssap::Ssap;
+use crate::ssap::ssap::{Ssap, Encryption};
 use std::env::Args;
 use std::path::Path;
 
@@ -60,6 +60,23 @@ pub fn parse(args: Args) -> Result<Ssap, SsapError> {
                     ssap.path = Path::new(&path.clone()).into();
                 } else {
                     return Err(SsapError::MissingPath);
+                }
+            }
+            "-e" | "--encryption" => {
+                if let Some(encryption) = args.next() {
+                    match encryption.as_str() {
+                        "aes_128_cbc" => {
+                            ssap.encryption = Encryption::aes_128_cbc;
+                        }
+                        "aes_256_ecb" => {
+                            ssap.encryption = Encryption::aes_256_ccb;
+                        }
+                        _ => {
+                            return Err(SsapError::InvalidEncryptionName);
+                        }
+                    }
+                } else {
+                    return Err(SsapError::InvalidEncryptionName);
                 }
             }
             input => {
