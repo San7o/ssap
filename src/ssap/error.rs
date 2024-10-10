@@ -57,21 +57,39 @@ impl Display for SsapError {
             SsapError::InvalidCiphertext => write!(f, "Invalid ciphertext"),
             SsapError::InvalidWrite => write!(f, "Invalid write"),
             SsapError::InvalidPath => write!(f, "Invalid path"),
-            SsapError::InvalidPasswordName => write!(f, "Invalid password name"),
-            SsapError::InvalidEncryptionName => write!(f, "Invalid encryption name"),
+            SsapError::InvalidPasswordName => {
+                write!(f, "Invalid password name")
+            }
+            SsapError::InvalidEncryptionName => {
+                write!(f, "Invalid encryption name")
+            }
             SsapError::InvalidCommand => write!(f, "Invalid command"),
-            SsapError::InvalidPasswordLength => write!(f, "Invalid password length"),
+            SsapError::InvalidPasswordLength => {
+                write!(f, "Invalid password length")
+            }
             SsapError::InvalidPassword => write!(f, "Invalid password"),
             SsapError::PasswordMismatch => write!(f, "Password mismatch"),
-            SsapError::PasswordAlreadyRegistered => write!(f, "Password already registered"),
-            SsapError::MissingPasswordName => write!(f, "Missing password name"),
-            SsapError::MissingPasswordLength => write!(f, "Missing password length"),
+            SsapError::PasswordAlreadyRegistered => {
+                write!(f, "Password already registered")
+            }
+            SsapError::MissingPasswordName => {
+                write!(f, "Missing password name")
+            }
+            SsapError::MissingPasswordLength => {
+                write!(f, "Missing password length")
+            }
             SsapError::MissingPath => write!(f, "Missing path"),
             SsapError::ErrorDecrypting => write!(f, "Error decrypting"),
-            SsapError::ErrorSavingClipboard => write!(f, "Error saving clipboard"),
-            SsapError::ErrorGeneratingPassword => write!(f, "Error generating password"),
+            SsapError::ErrorSavingClipboard => {
+                write!(f, "Error saving clipboard")
+            }
+            SsapError::ErrorGeneratingPassword => {
+                write!(f, "Error generating password")
+            }
             SsapError::ErrorGeneratingIV => write!(f, "Error generating IV"),
-            SsapError::PasswordNameNotFound => write!(f, "Password name not found"),
+            SsapError::PasswordNameNotFound => {
+                write!(f, "Password name not found")
+            }
         }
     }
 }

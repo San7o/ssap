@@ -205,13 +205,21 @@ mod tests {
         let key = vec![0x01, 0x02, 0x03, 0x04];
         let padded_key = pad_key(key, &Encryption::Aes_128_cbc);
         assert_eq!(padded_key.len(), 16);
-        assert_eq!(padded_key, vec![0x01, 0x02, 0x03, 0x04, 0,0,0,0,0,0,0,0,0,0,0,0]);
+        assert_eq!(
+            padded_key,
+            vec![0x01, 0x02, 0x03, 0x04, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        );
 
         let key = vec![0x01, 0x02, 0x03, 0x04];
         let padded_key = pad_key(key, &Encryption::Aes_256_cbc);
         assert_eq!(padded_key.len(), 32);
-        assert_eq!(padded_key, vec![0x01, 0x02, 0x03, 0x04,
-                   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
+        assert_eq!(
+            padded_key,
+            vec![
+                0x01, 0x02, 0x03, 0x04, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            ]
+        );
     }
 
     #[test]
