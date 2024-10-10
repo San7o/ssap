@@ -61,7 +61,7 @@ cargo run
 ```
 
 ## Usage
-Ssap is useful to generate safely store random password in a central location.
+Ssap is useful to generate and safely store random passwords in your local disk.
 
 You can generate a new password using the `new` option:
 ```bash
@@ -100,12 +100,12 @@ ssap delete linkedin --path ~/.my_secure_store
 ```
 
 ## Security tip
-For even mor security, you can change the permissions of the password file
-on linux with the following file:
+For even more security, you can change the permissions of the password file
+on linux with the following line:
 ```bash
 chmod o-wr ./.my_secure_file
 ```
-This way, no other user will be able to read or write to it, adding an
+No other user will be able to read or write to it, adding an
 additional layer of security in your system.
 
 ## Developmement
