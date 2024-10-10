@@ -1,8 +1,9 @@
 use crate::ssap::ssap::Ssap;
+use crate::ssap::error::SsapError;
 use std::path::Path;
 use std::env::Args;
 
-pub fn parse(args: Args) -> Ssap {
+pub fn parse(args: Args) -> Result<Ssap, SsapError> {
     let mut ssap = Ssap::default();
     let mut args = args.into_iter().skip(1);
     while let Some(arg) = args.next() {
@@ -19,6 +20,9 @@ pub fn parse(args: Args) -> Ssap {
             "generate" => {
                 ssap.generate = true;
             }
+            "delete" => {
+                ssap.delete_passwd = true;
+            }
             "-c" | "--clipboard" => {
                 ssap.copy_to_clipboard = true;
             }
@@ -30,8 +34,7 @@ pub fn parse(args: Args) -> Ssap {
                     ssap.path = Path::new(&path.clone()).into();
                 }
                 else {
-                    eprintln!("Error: path not provided");
-                    std::process::exit(1);
+                    return Err(SsapError::MissingPath);
                 }
             }
             input => {
@@ -40,5 +43,5 @@ pub fn parse(args: Args) -> Ssap {
         }
     }
 
-    return ssap;
+    return Ok(ssap);
 }

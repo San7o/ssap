@@ -5,3 +5,4 @@ edition = "2021"
 
 [dependencies]
 openssl = "0.10.66"
+rpassword = "7.3.1"

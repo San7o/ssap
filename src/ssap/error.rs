@@ -29,4 +29,10 @@ all
 pub enum SsapError {
     InvalidKey,
     InvalidCiphertext,
+    InvalidWrite,
+    InvalidPath,
+    InvalidPasswordName,
+    PasswordMismatch,
+    MissingPasswordName,
+    MissingPath,
 }

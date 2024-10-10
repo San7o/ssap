@@ -7,6 +7,7 @@ pub struct Ssap {
     pub create_new: bool,
     pub generate: bool,
     pub get_passwd: bool,
+    pub delete_passwd: bool,
     pub copy_to_clipboard: bool,
     pub silent: bool,
     pub input: Option<String>,
@@ -21,10 +22,11 @@ impl Ssap {
             create_new: false,
             generate: false,
             get_passwd: false,
+            delete_passwd: false,
             copy_to_clipboard: false,
             silent: false,
             input: None,
-            path: Path::new(".").into(),
+            path: Path::new("./.ssap.enc").into(),
         }
     }
 }

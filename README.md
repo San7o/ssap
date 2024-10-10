@@ -12,7 +12,7 @@
 
 
 USAGE:
-    ssap [FLAGS] [OPTIONS] [INPUT]
+    ssap [OPTIONS] [INPUT] [FLAGS]
 
 FLAGS:
     -h, --help         Prints help information
@@ -23,6 +23,7 @@ OPTIONS:
     new               Create a new password
     get               Get an existing password
     generate          Generate a new password
+    delete            Delete an existing password
 
 INPUT:
     The name of the password to create or get. The password
@@ -70,8 +71,8 @@ cargo fmt
 
 ## TODO
 - v1.0
-    - [x] symmetric encrypt / decrypt
-    - [ ] store / read from disk
+    - [ ] symmetric encrypt / decrypt
+    - [x] store / read from disk
     - [ ] generate passwords
     - [ ] backup decryption
 - v2.0

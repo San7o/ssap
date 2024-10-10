@@ -33,21 +33,12 @@ use std::env::{args, Args};
 fn main() {
     let args: Args = std::env::args();
     let settings = parse(args);
-    run(settings); 
-}
-
-fn help() {
-    // TODO
-}
-
-fn store() {
-    // TODO
-}
-
-fn read_disk() {
-    // TODO
-}
-
-fn new_iv() {
-    // TODO
+    if settings.is_err() {
+        eprintln!("Error: {:?}", settings.err().unwrap());
+        std::process::exit(1);
+    }
+    if let Err(e) = run(settings.unwrap()) {
+        eprintln!("Error: {:?}", e);
+        std::process::exit(1);
+    }
 }
