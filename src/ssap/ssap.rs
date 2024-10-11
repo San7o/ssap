@@ -36,6 +36,7 @@ pub enum Encryption {
 /// Struct holding SSAP settings
 #[derive(Debug, Clone)]
 pub struct Ssap {
+    pub version: Box<String>,
     pub show_help: bool,
     pub create_new: bool,
     pub get_passwd: bool,
@@ -53,6 +54,7 @@ impl Ssap {
     /// Create a new Ssap struct
     pub fn new() -> Self {
         Ssap {
+            version: Box::new(env!("CARGO_PKG_VERSION").to_owned()),
             show_help: false,
             create_new: false,
             get_passwd: false,
@@ -62,8 +64,8 @@ impl Ssap {
             silent: false,
             input: None,
             password_len: 30,
-            path: Path::new("./.ssap.enc").into(),
-            encryption: Encryption::Aes_128_cbc,
+            path: Path::new("./.vault.ssap").into(),
+            encryption: Encryption::Aes_256_cbc,
         }
     }
 }

@@ -10,6 +10,7 @@
    |\_________\\_________\|__|\|__|\|__|
    \|_________\|_________|
 
+Version: 1.0.0
 
 USAGE:
     ssap [OPTIONS] [INPUT] [FLAGS]
@@ -69,7 +70,7 @@ ssap new linkedin
 ```
 This will generate a new random password. You can specify the length of the password
 via the `-l` flag. Ssap will prompt you to insert a password to encrypt the random
-one, and then save it in `.ssap.enc`. You can specify the file path with the `--path` flag.
+one, and then save it in `.vault.ssap`. You can specify the file path with the `--path` flag.
 ```bash
 ssap new linkedin -l 20 --path ~/.my_secure_store
 > Creating new password with name: linkedin
@@ -98,6 +99,11 @@ And delete the password with `delete`:
 ssap delete linkedin --path ~/.my_secure_store
 > Password delete successfully
 ```
+
+## Version Control
+The program saves It's version on the vault file and ensures backward
+compatibility with old versions, so any vault will work correctly in
+any version even if newer versions have more features.
 
 ## Security tip
 For even more security, you can change the permissions of the password file

@@ -38,6 +38,7 @@ pub enum SsapError {
     InvalidCommand,
     InvalidPasswordLength,
     InvalidPassword,
+    InvalidVersion,
     PasswordMismatch,
     PasswordAlreadyRegistered,
     MissingPasswordName,
@@ -68,6 +69,7 @@ impl Display for SsapError {
                 write!(f, "Invalid password length")
             }
             SsapError::InvalidPassword => write!(f, "Invalid password"),
+            SsapError::InvalidVersion => write!(f, "Invalid version in valut file"),
             SsapError::PasswordMismatch => write!(f, "Password mismatch"),
             SsapError::PasswordAlreadyRegistered => {
                 write!(f, "Password already registered")

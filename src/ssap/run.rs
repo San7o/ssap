@@ -28,6 +28,7 @@ use crate::ssap::crypto::{decrypt_password, encrypt_password};
 use crate::ssap::error::SsapError;
 use crate::ssap::ssap::Ssap;
 use cli_clipboard;
+use regex::Regex;
 use std::fs;
 use std::fs::OpenOptions;
 use std::io::Write;
@@ -40,7 +41,8 @@ use std::path::Path;
 /// # Returns
 /// * A SsapError if the application fails
 ///
-pub fn run(settings: Ssap) -> Result<(), SsapError> {
+pub fn run(mut settings: Ssap) -> Result<(), SsapError> {
+    read_version(&settings.path, &mut settings.version)?;
     if settings.show_help {
         help();
         return Ok(());
@@ -57,6 +59,32 @@ pub fn run(settings: Ssap) -> Result<(), SsapError> {
         return Err(SsapError::InvalidCommand);
     }
 
+    Ok(())
+}
+
+fn read_version(path: &Box<Path>, version: &mut Box<String>) -> Result<(), SsapError> {
+    let file = fs::read_to_string(path.clone());
+    if file.is_err() {
+        return Ok(());
+    }
+
+    let file = file.unwrap();
+    let first_line = file.lines().next();
+    if first_line.is_none() {
+        return Ok(());
+    }
+
+    let first_line = first_line.unwrap();
+
+    let re = Regex::new(r"[0-9]+\.[0-9]+\.[0-9]+");
+    if re.is_err() {
+        return Ok(());
+    }
+    let re = re.unwrap();
+    if !re.is_match(first_line) {
+        return Err(SsapError::InvalidVersion);
+    }
+    *version = Box::new(first_line.to_owned());
     Ok(())
 }
 
@@ -130,6 +158,19 @@ fn save_password(
         return Err(SsapError::InvalidPath);
     }
     let mut file = file.unwrap();
+
+    let file_metadata = fs::metadata(settings.path.clone());
+    if file_metadata.is_err() {
+        return Err(SsapError::InvalidPath);
+    }
+    let file_metadata = file_metadata.unwrap();
+    let file_size = file_metadata.len();
+    if file_size == 0 {
+        if let Err(_e) = writeln!(&mut file, "{}", settings.version) {
+            return Err(SsapError::InvalidWrite);
+        }
+    }
+
     if let Err(_e) = writeln!(&mut file, "{}: {}", name, hex::encode(passwd)) {
         return Err(SsapError::InvalidWrite);
     }
@@ -142,7 +183,7 @@ fn check_password_exists(name: &String, path: Box<Path>) -> bool {
         return false;
     }
 
-    for line in file.unwrap().lines() {
+    for line in file.unwrap().lines().skip(1) {
         let mut parts = line.split(": ");
         if let Some(n) = parts.next() {
             if n == name {
@@ -180,7 +221,7 @@ fn read_password(name: String, path: Box<Path>) -> Result<Vec<u8>, SsapError> {
     if file.is_err() {
         return Err(SsapError::InvalidPath);
     }
-    for line in file.unwrap().lines() {
+    for line in file.unwrap().lines().skip(1) {
         let mut parts = line.split(": ");
         if let Some(n) = parts.next() {
             if n == name {
@@ -222,6 +263,11 @@ fn delete(settings: Ssap) -> Result<(), SsapError> {
     }
     let binding = file.unwrap();
     let mut lines = binding.lines();
+    let version = lines.next();
+    if version.is_none() {
+        return Err(SsapError::InvalidVersion);
+    }
+    let version = version.unwrap();
     let mut new_file = String::new();
     let mut found = false;
     while let Some(line) = lines.next() {
@@ -245,7 +291,7 @@ fn delete(settings: Ssap) -> Result<(), SsapError> {
         return Err(SsapError::InvalidPath);
     }
     let mut file = file.unwrap();
-    if let Err(_e) = write!(&mut file, "{}", new_file) {
+    if let Err(_e) = write!(&mut file, "{}\n{}", version, new_file) {
         return Err(SsapError::InvalidWrite);
     }
 
@@ -260,7 +306,7 @@ fn list(settings: Ssap) -> Result<(), SsapError> {
     }
 
     println!("> List of registered passwords:");
-    for line in file.unwrap().lines() {
+    for line in file.unwrap().lines().skip(1) {
         let mut parts = line.split(": ");
         if let Some(n) = parts.next() {
             println!(">  - {}", n);
@@ -280,10 +326,11 @@ fn help() {
     ____\_\  \ ____\_\  \ \__\ \__\ \__\   
    |\_________\\_________\|__|\|__|\|__|   
    \|_________\|_________|                 
-                                           
     "
     );
 
+    println!("Version: {}", env!("CARGO_PKG_VERSION"));
+    println!();
     println!("USAGE:");
     println!("    ssap [OPTIONS] [INPUT] [FLAGS]");
     println!();
